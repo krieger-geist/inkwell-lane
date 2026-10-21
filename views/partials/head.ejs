@@ -17,10 +17,10 @@
     <a href="/" class="brand"><span class="brand-mark">I</span>Inkwell Lane</a>
     <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
     <nav class="site-nav" id="siteNav">
-      <a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">Home</a>
-      <a href="/books" class="<%= currentPath.startsWith('/books') ? 'active' : '' %>">Browse</a>
-      <a href="/about" class="<%= currentPath === '/about' ? 'active' : '' %>">About</a>
-      <a href="/contact" class="<%= currentPath === '/contact' ? 'active' : '' %>">Contact</a>
+      <a href="/#top" data-section="top" class="<%= currentPath === '/' ? 'active' : '' %>">Home</a>
+      <a href="/#books" data-section="books" class="<%= currentPath.startsWith('/books') ? 'active' : '' %>">Books</a>
+      <a href="/#about" data-section="about">About</a>
+      <a href="/#contact" data-section="contact">Contact</a>
       <a href="/orders" class="<%= currentPath.startsWith('/orders') ? 'active' : '' %>">My Orders</a>
       <a href="/cart" class="cart-link <%= currentPath === '/cart' ? 'active' : '' %>">
         Cart <span class="cart-badge"><%= cartCount %></span>
@@ -29,6 +29,7 @@
         <span class="nav-divider"></span>
         <a href="/admin/books">Catalog</a>
         <a href="/admin/orders">Orders</a>
+        <a href="/admin/messages" class="<%= currentPath === '/admin/messages' ? 'active' : '' %>">Messages</a>
         <a href="/admin/logout">Log out</a>
       <% } %>
     </nav>

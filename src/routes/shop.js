@@ -1,22 +1,70 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Book = require('../models/Book');
+const Message = require('../models/Message');
 const { escapeRegex, categorySummary } = require('../utils/books');
 
 const router = express.Router();
 
-// Home page: hero + latest arrivals + popular categories
+// Home is a single long page: hero, the whole catalog, how ordering
+// works, about the store and the contact form.
+async function renderHome(req, res, extra = {}) {
+  const books = await Book.find().sort({ createdAt: -1 });
+  res.status(extra.status || 200).render('home', {
+    title: 'Home',
+    books,
+    categories: categorySummary(books),
+    subjects: Message.SUBJECTS,
+    contactSent: req.query.sent === '1',
+    contactErrors: [],
+    contactValues: {},
+    ...extra
+  });
+}
+
+function readContactInput(body) {
+  const values = {
+    name: String(body.name || '').trim(),
+    email: String(body.email || '').trim(),
+    phone: String(body.phone || '').trim(),
+    subject: String(body.subject || '').trim(),
+    orderNumber: String(body.orderNumber || '').trim().replace(/^#/, ''),
+    message: String(body.message || '').trim()
+  };
+  const errors = [];
+  if (!values.name || values.name.length > 100) errors.push('Please enter your name.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email) || values.email.length > 150) {
+    errors.push('Please enter a valid email address.');
+  }
+  if (values.phone && !/^[0-9+()\-\s]{7,20}$/.test(values.phone)) {
+    errors.push('Phone number can only contain digits, spaces, +, - and brackets.');
+  }
+  if (!Message.SUBJECTS.includes(values.subject)) errors.push('Please choose what your message is about.');
+  if (values.orderNumber.length > 20) errors.push('Order number looks too long.');
+  if (values.message.length < 10 || values.message.length > 2000) {
+    errors.push('Your message should be between 10 and 2000 characters.');
+  }
+  return { values, errors };
+}
+
 router.get('/', async (req, res, next) => {
   try {
-    const [latest, allBooks] = await Promise.all([
-      Book.find().sort({ createdAt: -1 }).limit(4),
-      Book.find({}, 'category').lean()
-    ]);
-    res.render('home', {
-      title: 'Home',
-      latest,
-      categories: categorySummary(allBooks).slice(0, 6)
-    });
+    await renderHome(req, res);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/contact', async (req, res, next) => {
+  try {
+    const { values, errors } = readContactInput(req.body);
+    if (errors.length) {
+      return await renderHome(req, res, {
+        status: 400, contactErrors: errors, contactValues: values, scrollTo: 'contact'
+      });
+    }
+    await Message.create(values);
+    res.redirect('/?sent=1#contact');
   } catch (err) {
     next(err);
   }
@@ -74,12 +122,8 @@ router.get('/books/:id', async (req, res, next) => {
   }
 });
 
-router.get('/about', (req, res) => {
-  res.render('about', { title: 'About' });
-});
-
-router.get('/contact', (req, res) => {
-  res.render('contact', { title: 'Contact' });
-});
+// About and Contact live on the home page now; keep the old URLs working.
+router.get('/about', (req, res) => res.redirect('/#about'));
+router.get('/contact', (req, res) => res.redirect('/#contact'));
 
 module.exports = router;

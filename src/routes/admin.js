@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Book = require('../models/Book');
 const Order = require('../models/Order');
 const CoverImage = require('../models/CoverImage');
+const Message = require('../models/Message');
 const { requireAdmin } = require('../middleware/auth');
 const upload = require('../config/multer');
 
@@ -135,6 +136,31 @@ router.post('/admin/orders/:id/status', requireAdmin, async (req, res, next) => 
     );
     if (!order) return res.status(404).send('Order not found.');
     res.redirect('/admin/orders?status=updated');
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ----- contact messages -----
+router.get('/admin/messages', requireAdmin, async (req, res, next) => {
+  try {
+    const messages = await Message.find().sort({ createdAt: -1 });
+    res.render('admin/messages', {
+      title: 'Messages',
+      messages,
+      deleted: req.query.deleted === '1'
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/admin/messages/:id/delete', requireAdmin, async (req, res, next) => {
+  try {
+    if (mongoose.isValidObjectId(req.params.id)) {
+      await Message.findByIdAndDelete(req.params.id);
+    }
+    res.redirect('/admin/messages?deleted=1');
   } catch (err) {
     next(err);
   }
