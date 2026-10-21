@@ -1,0 +1,71 @@
+<%- include('../partials/head', { title: title }) %>
+<div class="page-head"><h1><%= book ? 'Edit book' : 'Add a book' %></h1></div>
+
+<% if (errors.length) { %>
+  <div class="notice notice-error">
+    <strong>Please fix the following:</strong>
+    <ul><% errors.forEach(function (e) { %><li><%= e %></li><% }) %></ul>
+  </div>
+<% } %>
+
+<% const f = book ? book : (values || {}); %>
+<form action="<%= book ? '/admin/books/' + book._id : '/admin/books' %>" method="post" enctype="multipart/form-data" class="card form-card form-card-wide">
+  <label>Title *
+    <input type="text" name="title" maxlength="150" required value="<%= f.title || '' %>">
+  </label>
+  <label>Author
+    <input type="text" name="author" maxlength="100" value="<%= f.author || '' %>">
+  </label>
+  <div class="form-row">
+    <label>Price (₹) *
+      <input type="number" name="price" min="1" step="0.01" required value="<%= f.price || '' %>">
+    </label>
+    <label>Category
+      <input type="text" name="category" maxlength="50" value="<%= f.category || '' %>" placeholder="e.g. Fiction">
+    </label>
+  </div>
+  <div class="form-row">
+    <label>ISBN
+      <input type="text" name="isbn" maxlength="20" value="<%= f.isbn || '' %>" placeholder="e.g. 978-0-00-000000-0">
+    </label>
+    <label>Publisher
+      <input type="text" name="publisher" maxlength="120" value="<%= f.publisher || '' %>">
+    </label>
+  </div>
+  <div class="form-row">
+    <label>Publication year
+      <input type="number" name="publicationYear" min="1450" max="<%= new Date().getFullYear() + 5 %>" step="1" value="<%= f.publicationYear || '' %>">
+    </label>
+    <label>Number of pages
+      <input type="number" name="pages" min="1" step="1" value="<%= f.pages || '' %>">
+    </label>
+  </div>
+  <div class="form-row">
+    <label>Language
+      <input type="text" name="language" maxlength="50" value="<%= f.language || '' %>" placeholder="e.g. English">
+    </label>
+    <label>Format
+      <input type="text" name="format" maxlength="30" value="<%= f.format || '' %>" placeholder="e.g. Paperback">
+    </label>
+  </div>
+  <label>Description
+    <textarea name="description" rows="4" maxlength="2000" placeholder="A short blurb for the book page"><%= f.description || '' %></textarea>
+  </label>
+  <label>Cover image
+    <input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/gif" data-cover-input>
+    <span class="field-hint"><%= book ? 'Choose a new image to replace the current cover.' : 'Upload a cover image for this book.' %> JPG, PNG, WEBP or GIF · max 4 MB.</span>
+  </label>
+  <label>…or cover image URL
+    <input type="url" name="imageUrl" maxlength="500" value="<%= values && values.imageUrl ? values.imageUrl : '' %>" placeholder="https://covers.openlibrary.org/b/isbn/9780141439518-L.jpg">
+    <span class="field-hint">Paste a link to a cover image instead of uploading one. An uploaded file takes priority.</span>
+  </label>
+  <div class="current-cover" data-cover-preview-container <%= book && book.image ? '' : 'hidden' %>>
+    <span class="field-hint" data-cover-caption><%= book && book.image ? 'Current cover:' : 'Selected cover preview:' %></span>
+    <img src="<%= book && book.image ? book.image : '' %>" alt="Book cover preview" data-cover-preview>
+  </div>
+  <div class="form-actions">
+    <button type="submit" class="btn btn-big"><%= book ? 'Save changes' : 'Add book' %></button>
+    <a class="btn btn-ghost" href="/admin/books">Cancel</a>
+  </div>
+</form>
+<%- include('../partials/footer') %>

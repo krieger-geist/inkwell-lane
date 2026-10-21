@@ -1,0 +1,50 @@
+<%- include('../partials/head', { title: 'Manage books' }) %>
+<div class="page-head">
+  <h1>Catalog</h1>
+  <a class="btn" href="/admin/books/new">+ Add a book</a>
+</div>
+
+<% if (saved) { %><p class="notice notice-success">Book saved.</p><% } %>
+<% if (deleted) { %><p class="notice notice-info">Book deleted.</p><% } %>
+
+<% if (books.length) { %>
+  <div class="table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr><th></th><th>Title</th><th>Author</th><th>ISBN</th><th>Category</th><th class="num">Price</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% books.forEach(function (book) { %>
+          <tr>
+            <td>
+              <% if (book.image) { %>
+                <img class="table-thumb" src="<%= book.image %>" alt="">
+              <% } else { %>
+                <span class="table-thumb table-thumb-empty">📖</span>
+              <% } %>
+            </td>
+            <td><a href="/books/<%= book._id %>"><%= book.title %></a></td>
+            <td><%= book.author || '—' %></td>
+            <td><%= book.isbn || '—' %></td>
+            <td><%= book.category || '—' %></td>
+            <td class="num">₹<%= Number(book.price).toLocaleString('en-IN') %></td>
+            <td class="table-actions">
+              <a class="btn btn-small btn-ghost" href="/admin/books/<%= book._id %>/edit">Edit</a>
+              <form action="/admin/books/<%= book._id %>/delete" method="post" data-confirm="Delete “<%= book.title %>” permanently?">
+                <button type="submit" class="btn btn-small btn-danger-ghost">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } else { %>
+  <div class="empty-state">
+    <p class="empty-emoji">📚</p>
+    <h2>No books yet</h2>
+    <p class="muted">Add your first book to start selling.</p>
+    <a class="btn" href="/admin/books/new">Add a book</a>
+  </div>
+<% } %>
+<%- include('../partials/footer') %>

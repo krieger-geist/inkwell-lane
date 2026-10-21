@@ -1,0 +1,44 @@
+<%- include('partials/head', { title: 'Checkout' }) %>
+<div class="page-head"><h1>Checkout</h1></div>
+
+<% if (typeof error !== 'undefined' && error) { %>
+  <p class="notice notice-error"><%= error %></p>
+<% } %>
+<% const v = typeof values !== 'undefined' && values ? values : {}; %>
+
+<div class="checkout-layout">
+  <form action="/checkout" method="post" class="card form-card">
+    <h2>Delivery details</h2>
+    <p class="muted">Cash on delivery — no payment now.</p>
+    <label>Full name
+      <input type="text" name="name" maxlength="100" required value="<%= v.name || '' %>">
+    </label>
+    <label>Phone
+      <input type="tel" name="phone" maxlength="30" required value="<%= v.phone || '' %>">
+    </label>
+    <label>Address
+      <textarea name="address" rows="3" maxlength="200" required><%= v.address || '' %></textarea>
+    </label>
+    <div class="form-row">
+      <label>City
+        <input type="text" name="city" maxlength="100" required value="<%= v.city || '' %>">
+      </label>
+      <label>Postal code
+        <input type="text" name="postalCode" maxlength="20" required value="<%= v.postalCode || '' %>">
+      </label>
+    </div>
+    <button type="submit" class="btn btn-big btn-block">Place order</button>
+  </form>
+
+  <aside class="card order-summary">
+    <h2>Your order</h2>
+    <% items.forEach(function (item) { %>
+      <div class="summary-row">
+        <span><%= item.book.title %> × <%= item.quantity %></span>
+        <span>₹<%= Number(item.lineTotal).toLocaleString('en-IN') %></span>
+      </div>
+    <% }) %>
+    <div class="summary-row summary-total"><span>Total</span><span>₹<%= Number(total).toLocaleString('en-IN') %></span></div>
+  </aside>
+</div>
+<%- include('partials/footer') %>

@@ -1,0 +1,41 @@
+<%- include('../partials/head', { title: 'Manage orders' }) %>
+<div class="page-head"><h1>Orders</h1></div>
+
+<% if (statusUpdated) { %><p class="notice notice-success">Order status updated.</p><% } %>
+
+<% if (orders.length) { %>
+  <div class="table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr><th>Order</th><th>Placed</th><th>Customer</th><th class="num">Items</th><th class="num">Total</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <% orders.forEach(function (order) { %>
+          <tr>
+            <td><a href="/orders/<%= order._id %>">#<%= String(order._id).slice(-8).toUpperCase() %></a></td>
+            <td><%= order.createdAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) %></td>
+            <td><%= order.shipping.name %><br><span class="muted small"><%= order.shipping.phone %></span></td>
+            <td class="num"><%= order.items.reduce(function (n, i) { return n + i.quantity; }, 0) %></td>
+            <td class="num">₹<%= Number(order.total).toLocaleString('en-IN') %></td>
+            <td>
+              <form action="/admin/orders/<%= order._id %>/status" method="post" class="status-form">
+                <select name="status" onchange="this.form.submit()">
+                  <% ['Processing', 'Shipped', 'Delivered', 'Cancelled'].forEach(function (s) { %>
+                    <option value="<%= s %>" <%= order.status === s ? 'selected' : '' %>><%= s %></option>
+                  <% }) %>
+                </select>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } else { %>
+  <div class="empty-state">
+    <p class="empty-emoji">🧾</p>
+    <h2>No orders yet</h2>
+    <p class="muted">Orders will appear here once customers start checking out.</p>
+  </div>
+<% } %>
+<%- include('../partials/footer') %>

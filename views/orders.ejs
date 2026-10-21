@@ -1,0 +1,27 @@
+<%- include('partials/head', { title: 'My orders' }) %>
+<div class="page-head"><h1>My orders</h1></div>
+
+<% if (orders.length) { %>
+  <div class="order-list">
+    <% orders.forEach(function (order) { %>
+      <a class="card order-card" href="/orders/<%= order._id %>">
+        <div>
+          <p class="order-id">#<%= String(order._id).slice(-8).toUpperCase() %></p>
+          <p class="muted"><%= order.items.reduce(function (n, i) { return n + i.quantity; }, 0) %> item(s) · Placed <%= order.createdAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></p>
+        </div>
+        <div class="order-card-right">
+          <span class="price">₹<%= Number(order.total).toLocaleString('en-IN') %></span>
+          <%- include('partials/status-badge', { status: order.status }) %>
+        </div>
+      </a>
+    <% }) %>
+  </div>
+<% } else { %>
+  <div class="empty-state">
+    <p class="empty-emoji">📦</p>
+    <h2>No orders yet</h2>
+    <p class="muted">When you place an order it will show up here.</p>
+    <a class="btn" href="/books">Start browsing</a>
+  </div>
+<% } %>
+<%- include('partials/footer') %>

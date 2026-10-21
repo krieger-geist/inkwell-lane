@@ -1,0 +1,20 @@
+<article class="book-card">
+  <a class="book-cover" href="/books/<%= book._id %>">
+    <% if (book.image) { %>
+      <img src="<%= book.image %>" alt="Cover of <%= book.title %>" loading="lazy">
+    <% } else { %>
+      <span class="cover-fallback"><%= book.title %></span>
+    <% } %>
+  </a>
+  <div class="book-card-body">
+    <% if (book.category) { %><p class="book-card-category"><%= book.category %></p><% } %>
+    <h3 class="book-card-title"><a href="/books/<%= book._id %>"><%= book.title %></a></h3>
+    <p class="book-card-author"><%= book.author || 'Unknown author' %></p>
+    <div class="book-card-foot">
+      <span class="price">₹<%= Number(book.price).toLocaleString('en-IN') %></span>
+      <form action="/cart/add/<%= book._id %>" method="post">
+        <button type="submit" class="btn btn-small">Add to cart</button>
+      </form>
+    </div>
+  </div>
+</article>

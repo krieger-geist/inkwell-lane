@@ -1,0 +1,39 @@
+<%- include('partials/head', { title: 'Browse books' }) %>
+<div class="page-head">
+  <h1>Browse the shelf</h1>
+  <form action="/books" method="get" class="filter-bar">
+    <input type="search" name="q" value="<%= q %>" placeholder="Title or author…">
+    <% if (category) { %><input type="hidden" name="category" value="<%= category %>"><% } %>
+    <button type="submit" class="btn">Search</button>
+    <% if (q || category) { %><a class="btn btn-ghost" href="/books">Clear</a><% } %>
+  </form>
+</div>
+
+<% if (categories.length) { %>
+<div class="chip-row">
+  <a class="chip <%= !category ? 'chip-active' : '' %>" href="/books<%= q ? '?q=' + encodeURIComponent(q) : '' %>">All</a>
+  <% categories.forEach(function (cat) { %>
+    <a class="chip <%= category.toLowerCase() === cat.name.toLowerCase() ? 'chip-active' : '' %>"
+       href="/books?category=<%= encodeURIComponent(cat.name) %><%= q ? '&q=' + encodeURIComponent(q) : '' %>">
+      <%= cat.name %> <span class="chip-count"><%= cat.count %></span>
+    </a>
+  <% }) %>
+</div>
+<% } %>
+
+<% if (books.length) { %>
+  <p class="result-count"><%= books.length %> book<%= books.length === 1 ? '' : 's' %><%= q ? ' matching “' + q + '”' : '' %></p>
+  <div class="book-grid">
+    <% books.forEach(function (book) { %>
+      <%- include('partials/book-card', { book: book }) %>
+    <% }) %>
+  </div>
+<% } else { %>
+  <div class="empty-state">
+    <p class="empty-emoji">🔍</p>
+    <h2>Nothing on this part of the shelf</h2>
+    <p class="muted">Try a different search term or category.</p>
+    <a class="btn" href="/books">Browse everything</a>
+  </div>
+<% } %>
+<%- include('partials/footer') %>

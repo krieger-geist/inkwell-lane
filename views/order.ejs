@@ -1,0 +1,33 @@
+<%- include('partials/head', { title: 'Order details' }) %>
+<div class="page-head">
+  <h1>Order #<%= String(order._id).slice(-8).toUpperCase() %></h1>
+  <%- include('partials/status-badge', { status: order.status }) %>
+</div>
+
+<% if (typeof placed !== 'undefined' && placed) { %>
+  <p class="notice notice-success">Order placed! Keep the order number handy — we’ll call before dispatch.</p>
+<% } %>
+
+<div class="checkout-layout">
+  <div class="card">
+    <h2>Items</h2>
+    <% order.items.forEach(function (item) { %>
+      <div class="order-line">
+        <span><%= item.title %> <span class="muted">× <%= item.quantity %></span></span>
+        <span>₹<%= Number(item.price * item.quantity).toLocaleString('en-IN') %></span>
+      </div>
+    <% }) %>
+    <div class="summary-row summary-total"><span>Total (cash on delivery)</span><span>₹<%= Number(order.total).toLocaleString('en-IN') %></span></div>
+    <p class="muted small">Placed on <%= order.createdAt.toLocaleString('en-IN') %></p>
+  </div>
+
+  <aside class="card">
+    <h2>Deliver to</h2>
+    <p><strong><%= order.shipping.name %></strong><br>
+    <%= order.shipping.phone %><br>
+    <%= order.shipping.address %><br>
+    <%= order.shipping.city %> – <%= order.shipping.postalCode %></p>
+    <a class="text-link" href="/orders">← All my orders</a>
+  </aside>
+</div>
+<%- include('partials/footer') %>

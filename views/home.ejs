@@ -1,0 +1,88 @@
+<%- include('partials/head', { title: 'Home' }) %>
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Independent bookstore · Since 2019</p>
+    <h1>Find your next<br>favourite read.</h1>
+    <p class="hero-sub">Bestselling fiction, big-idea non-fiction and books that change how you live — every one chosen by our booksellers. Order online and pay when the book reaches your door.</p>
+    <form action="/books" method="get" class="hero-search">
+      <input type="search" name="q" placeholder="Search by title or author…" aria-label="Search books">
+      <button type="submit" class="btn">Search</button>
+    </form>
+    <div class="hero-links">
+      <a class="btn btn-ghost" href="/books">Browse the shelf</a>
+      <a class="text-link" href="/about">How it works →</a>
+    </div>
+  </div>
+  <% const heroCovers = latest.filter(function (b) { return b.image; }).slice(0, 3); %>
+  <div class="hero-art" aria-hidden="true">
+    <% if (heroCovers.length === 3) { %>
+    <div class="cover-fan">
+      <% heroCovers.forEach(function (b, i) { %>
+        <a class="fan-cover fan-cover-<%= i + 1 %>" href="/books/<%= b._id %>" tabindex="-1">
+          <img src="<%= b.image %>" alt="">
+        </a>
+      <% }) %>
+    </div>
+    <% } else { %>
+    <div class="shelf">
+      <span class="spine spine-1"></span>
+      <span class="spine spine-2"></span>
+      <span class="spine spine-3"></span>
+      <span class="spine spine-4"></span>
+      <span class="spine spine-5"></span>
+    </div>
+    <% } %>
+  </div>
+</section>
+
+<% if (typeof categories !== 'undefined' && categories.length) { %>
+<section class="section">
+  <h2 class="section-title">Shop by category</h2>
+  <div class="chip-row">
+    <% categories.forEach(function (cat) { %>
+      <a class="chip" href="/books?category=<%= encodeURIComponent(cat.name) %>">
+        <%= cat.name %> <span class="chip-count"><%= cat.count %></span>
+      </a>
+    <% }) %>
+  </div>
+</section>
+<% } %>
+
+<% if (latest.length) { %>
+<section class="section">
+  <div class="section-head">
+    <h2 class="section-title">New arrivals</h2>
+    <a class="text-link" href="/books">See everything →</a>
+  </div>
+  <div class="book-grid">
+    <% latest.forEach(function (book) { %>
+      <%- include('partials/book-card', { book: book }) %>
+    <% }) %>
+  </div>
+</section>
+<% } else { %>
+<section class="section empty-cta">
+  <h2 class="section-title">New stock is on its way</h2>
+  <p class="muted">We are restocking the shelves right now. Check back shortly, or get in touch and we will set a copy aside for you.</p>
+  <a class="btn btn-ghost" href="/contact">Contact the shop</a>
+</section>
+<% } %>
+
+<section class="section steps">
+  <div class="step">
+    <span class="step-number">1</span>
+    <h3>Pick your books</h3>
+    <p>Search the shelf, add what you like to the cart — up to 20 copies of each title.</p>
+  </div>
+  <div class="step">
+    <span class="step-number">2</span>
+    <h3>Checkout in a minute</h3>
+    <p>Just your delivery details. No account, no card, no fuss.</p>
+  </div>
+  <div class="step">
+    <span class="step-number">3</span>
+    <h3>Pay on delivery</h3>
+    <p>We hand you the book, you hand us cash. Track the order anytime from My Orders.</p>
+  </div>
+</section>
+<%- include('partials/footer') %>

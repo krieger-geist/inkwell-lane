@@ -1,0 +1,59 @@
+<%- include('partials/head', { title: 'Your cart' }) %>
+<div class="page-head"><h1>Your cart</h1></div>
+
+<% if (justAdded) { %><p class="notice notice-success">Added to your cart.</p><% } %>
+<% if (quantityUpdated) { %><p class="notice notice-info">Quantities updated.</p><% } %>
+<% if (itemRemoved) { %><p class="notice notice-info">Item removed.</p><% } %>
+<% if (removedUnavailable) { %><p class="notice notice-info">Some items were removed because they are no longer available.</p><% } %>
+<% if (attemptedEmptyCheckout) { %><p class="notice notice-error">Your cart is empty — add a book first.</p><% } %>
+
+<% if (items.length) { %>
+  <div class="cart-layout">
+    <div class="cart-items">
+      <% items.forEach(function (item) { %>
+        <div class="cart-item">
+          <a class="cart-thumb" href="/books/<%= item.book._id %>">
+            <% if (item.book.image) { %>
+              <img src="<%= item.book.image %>" alt="<%= item.book.title %>">
+            <% } else { %>
+              <span class="cover-fallback cover-fallback-small"><%= item.book.title %></span>
+            <% } %>
+          </a>
+          <div class="cart-item-info">
+            <h3><a href="/books/<%= item.book._id %>"><%= item.book.title %></a></h3>
+            <p class="muted"><%= item.book.author || 'Unknown author' %></p>
+            <p class="price">₹<%= Number(item.book.price).toLocaleString('en-IN') %> each</p>
+          </div>
+          <div class="cart-item-actions">
+            <form action="/cart/update/<%= item.book._id %>" method="post" class="qty-form">
+              <label>Qty
+                <input type="number" name="quantity" value="<%= item.quantity %>" min="1" max="20" inputmode="numeric">
+              </label>
+              <button type="submit" class="btn btn-small btn-ghost">Update</button>
+            </form>
+            <form action="/cart/remove/<%= item.book._id %>" method="post" data-confirm="Remove this book from your cart?">
+              <button type="submit" class="btn btn-small btn-danger-ghost">Remove</button>
+            </form>
+          </div>
+          <p class="cart-line-total">₹<%= Number(item.lineTotal).toLocaleString('en-IN') %></p>
+        </div>
+      <% }) %>
+    </div>
+    <aside class="cart-summary">
+      <h2>Summary</h2>
+      <div class="summary-row"><span>Items</span><span><%= items.reduce(function (n, i) { return n + i.quantity; }, 0) %></span></div>
+      <div class="summary-row summary-total"><span>Total</span><span>₹<%= Number(total).toLocaleString('en-IN') %></span></div>
+      <p class="muted small">Payable in cash when your order arrives.</p>
+      <a class="btn btn-big btn-block" href="/checkout">Proceed to checkout</a>
+      <a class="text-link btn-block-center" href="/books">← Continue browsing</a>
+    </aside>
+  </div>
+<% } else { %>
+  <div class="empty-state">
+    <p class="empty-emoji">🛒</p>
+    <h2>Your cart is empty</h2>
+    <p class="muted">Every great story starts with a first page.</p>
+    <a class="btn" href="/books">Browse books</a>
+  </div>
+<% } %>
+<%- include('partials/footer') %>

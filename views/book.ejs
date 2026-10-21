@@ -1,0 +1,62 @@
+<%- include('partials/head', { title: book.title }) %>
+<nav class="breadcrumb"><a href="/books">← Back to the shelf</a></nav>
+
+<% if (typeof added !== 'undefined' && added) { %>
+  <p class="notice notice-success">Added to your cart.</p>
+<% } %>
+
+<div class="book-detail">
+  <div class="book-detail-cover">
+    <% if (book.image) { %>
+      <img src="<%= book.image %>" alt="Cover of <%= book.title %>">
+    <% } else { %>
+      <span class="cover-fallback cover-fallback-large"><%= book.title %></span>
+    <% } %>
+  </div>
+  <div class="book-detail-info">
+    <% if (book.category) { %>
+      <a class="chip chip-small" href="/books?category=<%= encodeURIComponent(book.category) %>"><%= book.category %></a>
+    <% } %>
+    <h1><%= book.title %></h1>
+    <p class="detail-author">by <%= book.author || 'Unknown author' %></p>
+    <p class="price price-large">₹<%= Number(book.price).toLocaleString('en-IN') %></p>
+    <% if (book.description) { %><p class="detail-description"><%= book.description %></p><% } %>
+    <% const specifications = [
+      ['ISBN', book.isbn],
+      ['Publisher', book.publisher],
+      ['Publication year', book.publicationYear],
+      ['Pages', book.pages],
+      ['Language', book.language],
+      ['Format', book.format]
+    ].filter(function (item) { return item[1] !== undefined && item[1] !== null && item[1] !== ''; }); %>
+    <% if (specifications.length) { %>
+      <dl class="book-specifications">
+        <% specifications.forEach(function (item) { %>
+          <div><dt><%= item[0] %></dt><dd><%= item[1] %></dd></div>
+        <% }) %>
+      </dl>
+    <% } %>
+    <p class="muted">Cash on delivery · Ships within 24 hours · Free delivery on orders above ₹999</p>
+
+    <form action="/cart/add/<%= book._id %>" method="post" class="buy-row">
+      <label class="qty-field">
+        Qty
+        <input type="number" name="quantity" value="1" min="1" max="20" inputmode="numeric">
+      </label>
+      <input type="hidden" name="stay" value="1">
+      <button type="submit" class="btn btn-big">Add to cart</button>
+    </form>
+  </div>
+</div>
+
+<% if (related.length) { %>
+<section class="section">
+  <h2 class="section-title">More in <%= book.category %></h2>
+  <div class="book-grid">
+    <% related.forEach(function (b) { %>
+      <%- include('partials/book-card', { book: b }) %>
+    <% }) %>
+  </div>
+</section>
+<% } %>
+<%- include('partials/footer') %>
