@@ -1,6 +1,6 @@
 # Inkwell Lane
 
-Inkwell Lane is an online bookstore. Customers browse a hand-picked catalog, search by title or author, filter by category, add books to a cart, and order with cash on delivery. They don't need an account. A password-protected admin panel lets the store owner manage the catalog and update order statuses.
+Inkwell Lane is an online bookstore. Customers browse a hand-picked catalog, search by title or author, filter by category, add books to a cart, and order with cash on delivery. They don't need an account. A password-protected admin panel lets the store owner manage the catalog, update order statuses and read messages sent through the contact form.
 
 The site is server-rendered with **Express**, **EJS** and **MongoDB**. It has a modern navy-and-indigo design and fills the full width of the screen on phones, tablets and large desktops alike.
 
@@ -43,6 +43,22 @@ The store opens with six titles, each with its real cover and publication detail
 | Ikigai: The Japanese Secret to a Long and Happy Life | Héctor García & Francesc Miralles | Self-Help | ₹450 |
 | The Midnight Library | Matt Haig | Fiction | ₹499 |
 
+## Pages
+
+| URL | Page |
+|---|---|
+| `/` | One-page home: hero, books, how it works, about, contact |
+| `/#books`, `/#about`, `/#contact` | Jump straight to a home-page section (`/about` and `/contact` redirect here) |
+| `/books` | Search results and category filters |
+| `/books/:id` | Book details |
+| `/cart` | Shopping cart |
+| `/checkout` | Delivery details and order placement |
+| `/orders`, `/orders/:id` | Order history and order tracking |
+| `/admin/login` | Admin sign-in |
+| `/admin/books` | Catalog management (add, edit, delete books) |
+| `/admin/orders` | Orders dashboard |
+| `/admin/messages` | Contact-form messages |
+
 ## Tech stack
 
 | Layer | Technology |
@@ -81,3 +97,8 @@ public/
   images/books/      book cover images
   images/about/      photos for the About section
 ```
+
+## Image credits
+
+- Book covers: [Open Library Covers](https://openlibrary.org/dev/docs/api/covers)
+- About section photos: [Unsplash](https://unsplash.com), free to use under the [Unsplash License](https://unsplash.com/license)
