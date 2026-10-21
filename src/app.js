@@ -23,6 +23,12 @@ app.set('trust proxy', 1);
 
 app.use(express.static(path.join(__dirname, '..', 'public'), { maxAge: isProduction ? '7d' : 0 }));
 app.use(express.urlencoded({ extended: true }));
+// Express 5 leaves req.body undefined when a request has no form body
+// (e.g. an "Add to cart" button with no fields); routes expect an object.
+app.use((req, res, next) => {
+  if (req.body === undefined) req.body = {};
+  next();
+});
 
 // Template defaults, so error pages can render even if the database or
 // session middleware below fails before `locals` runs.

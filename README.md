@@ -1,93 +1,76 @@
 # Inkwell Lane
 
-An independent online bookstore, built with **Express + EJS + MongoDB** (server-rendered, sessions stored in MongoDB). Customers browse and search the catalog, add books to a cart, and check out with cash on delivery. An admin panel manages the catalog and order statuses.
+Inkwell Lane is an online bookstore. Customers browse a hand-picked catalog, search by title or author, filter by category, add books to a cart, and order with cash on delivery. They don't need an account. A password-protected admin panel lets the store owner manage the catalog and update order statuses.
 
-Runs locally with `npm run dev`. On Vercel it runs as one serverless function.
+The site is server-rendered with **Express**, **EJS** and **MongoDB**. It has a modern navy-and-indigo design and works on phones as well as desktops.
 
 ## Features
 
-**Shop**
-- Home page with search, a cover showcase, shopping by category, and new arrivals
-- Browse page with text search (title/author) and category filters
-- Book detail pages with full specifications (ISBN, publisher, year, pages, language, format) and related titles
-- Session-based cart (update quantities, remove items, up to 20 copies per title)
-- Cash-on-delivery checkout with delivery details
-- Order history and order tracking (no account needed: orders are tied to your browser session)
+### For customers
+- **Home page**: a banner with featured book covers, a search bar, shopping by category, new arrivals, and a short "how ordering works" guide
+- **Browse**: search by title or author, plus category filters with book counts
+- **Book pages**: cover, price, description and full specifications (ISBN, publisher, publication year, pages, language, format), plus related titles from the same category
+- **Cart**: change quantities (up to 20 copies per title) or remove items. Books removed from the catalog are cleared automatically
+- **Checkout**: delivery details only, then pay in cash on delivery
+- **My Orders**: order history and status tracking, tied to the visitor's browser session
+- **About and Contact** pages with store information and quick answers
 
-**Admin (`/admin/login`)**
-- Add, edit and delete books. Covers can be uploaded (JPG, PNG, WEBP or GIF, max 4 MB) or added by pasting an image URL
-- Order dashboard with one-click status updates (Processing → Shipped → Delivered / Cancelled)
+### For the store owner (`/admin`)
+- Add, edit and delete books, with a live cover preview
+- Upload a cover image (JPG, PNG, WEBP or GIF, up to 4 MB) or paste a cover image URL
+- Orders dashboard with one-click status changes: Processing → Shipped → Delivered / Cancelled
 
-**Opening catalog**: `npm run seed` stocks 6 titles with real covers and details: *Atomic Habits*, *The Psychology of Money*, *The Alchemist*, *Sapiens*, *Ikigai* and *The Midnight Library*.
+### Deliberately left out
+- Online payments (cash on delivery only)
+- Customer accounts and stored passwords
+- Email notifications
 
-**Deliberately not included**
-- No online payments (cash on delivery only)
-- No email sending or SMTP configuration
-- No customer accounts or password storage
+## Catalog
 
-## Requirements
+The store opens with six titles, each with its real cover and publication details:
 
-- Node.js 20+
-- MongoDB: a local install, or a free MongoDB Atlas cluster (Vercel requires Atlas)
+| Title | Author | Category | Price |
+|---|---|---|---|
+| Atomic Habits | James Clear | Self-Help | ₹499 |
+| The Psychology of Money | Morgan Housel | Finance | ₹399 |
+| The Alchemist | Paulo Coelho | Fiction | ₹350 |
+| Sapiens: A Brief History of Humankind | Yuval Noah Harari | History | ₹599 |
+| Ikigai: The Japanese Secret to a Long and Happy Life | Héctor García & Francesc Miralles | Self-Help | ₹450 |
+| The Midnight Library | Matt Haig | Fiction | ₹499 |
 
-## Run locally
+## Tech stack
 
-```bash
-npm install
-cp .env.example .env      # Windows PowerShell: copy .env.example .env
-npm run seed              # adds the 6 opening books
-npm run dev               # open http://localhost:3000
-```
+| Layer | Technology |
+|---|---|
+| Server | Node.js, Express 5 |
+| Views | EJS templates (server-side rendering) |
+| Database | MongoDB with Mongoose |
+| Sessions | express-session, stored in MongoDB (connect-mongo) |
+| Uploads | Multer. Uploaded covers are stored in MongoDB and served from `/covers/:id` |
+| Styling | Hand-written CSS with design tokens. Fonts: DM Serif Display and Plus Jakarta Sans |
 
-Admin panel: http://localhost:3000/admin/login, using the `ADMIN_USERNAME` / `ADMIN_PASSWORD` from `.env`.
+## Data model
 
-## Environment variables
-
-| Variable         | Purpose                                                       |
-|------------------|---------------------------------------------------------------|
-| `MONGODB_URI`    | MongoDB connection string. Defaults to `mongodb://127.0.0.1:27017/inkwell-lane` |
-| `SESSION_SECRET` | Long random string (32+ characters) used to sign session cookies |
-| `ADMIN_USERNAME` | Admin login username                                          |
-| `ADMIN_PASSWORD` | Admin login password                                          |
-| `NODE_ENV`       | `production` on Vercel (enables secure cookies)               |
-| `PORT`           | Local port (default 3000; ignored on Vercel)                  |
-
-## Deploy to Vercel
-
-1. **Create a MongoDB Atlas database** (free M0 tier) at https://www.mongodb.com/cloud/atlas
-   - *Database Access*: add a database user with a password.
-   - *Network Access*: add `0.0.0.0/0` (Vercel servers use changing IP addresses).
-   - *Connect → Drivers*: copy the connection string and add a database name before the `?`:
-     `mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/inkwell-lane?retryWrites=true&w=majority`
-2. **Seed Atlas once from your machine.** Put the Atlas URI in `.env` as `MONGODB_URI`, then run `npm run seed`.
-3. **Push the project to GitHub.** Make the `booknest` folder (the one with `package.json`) the repository root.
-4. **Import the repository on Vercel** (https://vercel.com/new). Leave Framework Preset as **Other** and leave the build and output settings empty.
-5. **Add these Environment Variables** in the project settings: `MONGODB_URI`, `SESSION_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD`, and `NODE_ENV=production`.
-6. **Deploy.** Every later `git push` redeploys automatically.
-
-How it runs on Vercel: `vercel.json` sends every request that isn't a static file in `public/` to `api/index.js`, which exports the Express app. The MongoDB connection is cached between invocations. Uploaded covers are stored in MongoDB (`coverimages` collection) and served from `/covers/:id`, because Vercel's filesystem is read-only.
-
-## Commands
-
-- `npm run dev`: start with nodemon (auto-restart)
-- `npm start`: start the app
-- `npm run seed`: add the opening catalog (safe to re-run; `npm run seed -- --reset` wipes all books first)
-- `npm run check`: syntax-check the entry files
+- **Book**: title, author, price, category, description, cover image, ISBN, publisher, publication year, pages, language, format
+- **Order**: the ordered items (a snapshot of title, price and quantity), delivery details, total, status, and the session that placed it
+- **CoverImage**: the image data and type for an uploaded cover
 
 ## Project structure
 
 ```
-api/index.js         Vercel serverless entry (exports the Express app)
-vercel.json          Vercel routing + function config
+api/index.js         serverless entry point (exports the Express app)
 src/
-  server.js          local entry point (DB connect + listen)
-  app.js             express app wiring, sessions, 404 + error handlers
-  seed.js            opening catalog
-  config/            cached db connection, multer upload config
-  models/            Mongoose models (Book, Order, CoverImage)
-  middleware/        admin guard, template locals
+  server.js          app entry point (connects to the database, starts the server)
+  app.js             Express setup: sessions, routes, 404 and error pages
+  seed.js            the opening catalog
+  config/            database connection, upload settings
+  models/            Book, Order, CoverImage
+  middleware/        admin guard, shared template values
   routes/            shop, cart, orders, admin, covers
-  utils/             cart helpers, search/category helpers
-views/               EJS templates (partials + pages + admin)
-public/              css, js, book cover images
+  utils/             cart and catalog helpers
+views/               EJS pages, admin pages and shared partials
+public/
+  css/style.css      site styles
+  js/main.js         mobile menu, confirm dialogs, cover preview
+  images/books/      book cover images
 ```
